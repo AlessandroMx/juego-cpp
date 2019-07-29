@@ -198,13 +198,38 @@ void moverArriba(vector<vector<int>> tablero)
     // de lo contrario se queda ahi el numero
     // si no hay numero sube un espacio
     cout << "Moviendo arriba las celdas del tablero" << endl;
-    for (int i = tamano - 1; i > 0; i--) {
+    int movimientoPosible = 1;
+    for (int i = 1; i < tamano; i++) {
         for (int j = 0; j < tamano; j++) {
-            // cout << tablero[i][j] << " ";
-            
+            // Si ya hay una celda con un numero antes al presente
+            // actualizar con la suma de ambos
+            if (tablero[i][j] == 0) continue;
+            if (tablero[i - 1][j] == 0) {
+                tablero[i - 1][j] = tablero[i][j];
+                tablero[i][j] = 0;
+            } else if (tablero[i - 1][j] == tablero[i][j]) {
+                tablero[i - 1][j] += tablero[i][j];
+                tablero[i][j] = 0;
+            }
         }
-        // cout << endl;
     }
+    cout << "Tablero Actual" << endl;
+        for (int i = 0; i < tamano; i++)
+        {
+            for (int j = 0; j < tamano; j++)
+            {
+                if (tablero[i][j] == 0)
+                {
+                    cout << "."
+                        << "\t";
+                }
+                else
+                {
+                    cout << tablero[i][j] << "\t";
+                }
+            }
+            cout << endl;
+        }
     system("pause");
 }
 
@@ -216,53 +241,58 @@ void jugar(string nombreTablero)
     // Guardar tamano del tablero en variable
     int tamano = tablero.size();
 
-    // Imprimir el tablero
-    system("CLS");
-    cout << "Tablero Actual" << endl;
-    for (int i = 0; i < tamano; i++)
-    {
-        for (int j = 0; j < tamano; j++)
+    // Variable para marcar si el juego ha terminado
+    bool juegoTerminado = false;
+
+    // Jugar mientras sea posible
+    do {
+        // Imprimir el tablero
+        system("CLS");
+        cout << "Tablero Actual" << endl;
+        for (int i = 0; i < tamano; i++)
         {
-            if (tablero[i][j] == 0)
+            for (int j = 0; j < tamano; j++)
             {
-                cout << "."
-                     << "\t";
+                if (tablero[i][j] == 0)
+                {
+                    cout << "."
+                        << "\t";
+                }
+                else
+                {
+                    cout << tablero[i][j] << "\t";
+                }
             }
-            else
-            {
-                cout << tablero[i][j] << "\t";
-            }
+            cout << endl;
         }
-        cout << endl;
-    }
 
-    // Leer movimiento y de acuerdo a este seleccionar una accion
-    // w: arriba
-    // a: izquierda
-    // s: abajo
-    // d: derecha
-    string movimiento;
-    cin >> movimiento;
+        // Leer movimiento y de acuerdo a este seleccionar una accion
+        // w: arriba
+        // a: izquierda
+        // s: abajo
+        // d: derecha
+        string movimiento;
+        cin >> movimiento;
 
-    if (movimiento == "w")
-    {
-        moverArriba(tablero);
-    } else if (movimiento == "s")
-    {
-        /* code */
-    } else if (movimiento == "a")
-    {
-        /* code */
-    } else if (movimiento == "d")
-    {
-        /* code */
-    } else {
-        cout << "Opcion invalida. Vuelva a intentarlo" << endl;
+        if (movimiento == "w")
+        {
+            moverArriba(tablero);
+        } else if (movimiento == "s")
+        {
+            /* code */
+        } else if (movimiento == "a")
+        {
+            /* code */
+        } else if (movimiento == "d")
+        {
+            /* code */
+        } else {
+            cout << "Opcion invalida. Vuelva a intentarlo" << endl;
+            system("pause");
+        }
         system("pause");
-    }
-    vector<vector<int>>().swap(tablero);
-    jugar(nombreTablero);
-    system("pause");
+    } while(!juegoTerminado);
+
 }
 
 void nuevoJuego()
