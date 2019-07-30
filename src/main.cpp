@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cstdlib>
 #include <ctime>
 #include <fstream>
 #include <sstream>
@@ -43,6 +44,8 @@ int obtenerNumero(int opcMin, int opcMax)
 
 int **generarMatrizAleatoria(unsigned tamano)
 {
+    // Establecer semilla del random
+    srand(time(NULL));
     // Esta funcion genera un array de dos dimensiones
     // Empieza generando un puntero
     int **arr = new int *[tamano];
@@ -189,49 +192,239 @@ vector<vector<int>> leerTablero(string nombreTablero)
     return tablero;
 }
 
-void moverArriba(vector<vector<int>> tablero)
+int checarLleno(vector<vector<int>>& tablero) {
+    int tamano = tablero.size();
+    int lleno = 1;
+    for (int i = 1; i < tamano; i++) {
+        for (int j = 0; j < tamano; j++) {
+            if (tablero[i][j] == 0) {
+                lleno = 0;
+            }
+        }
+    }
+    return lleno;
+}
+
+int moverArriba(vector<vector<int>>& tablero)
 {
+    // Status juego es el estado en el que se encuentre el juego
+    // 0 -> Normal
+    // 1 -> Perdio
+    // 2 -> Gano
+    int statusJuego = 0;
+
     int tamano = tablero.size();
 
     // Recorrer desde la parte de abajo los numeros
     // si un numero es igual al de arriba se suma
     // de lo contrario se queda ahi el numero
     // si no hay numero sube un espacio
-    cout << "Moviendo arriba las celdas del tablero" << endl;
-    int movimientoPosible = 1;
     for (int i = 1; i < tamano; i++) {
         for (int j = 0; j < tamano; j++) {
-            // Si ya hay una celda con un numero antes al presente
-            // actualizar con la suma de ambos
-            if (tablero[i][j] == 0) continue;
-            if (tablero[i - 1][j] == 0) {
-                tablero[i - 1][j] = tablero[i][j];
-                tablero[i][j] = 0;
-            } else if (tablero[i - 1][j] == tablero[i][j]) {
-                tablero[i - 1][j] += tablero[i][j];
-                tablero[i][j] = 0;
+            int tmpIndex = i;
+            for (int k = 0; k < i; k++) {
+                // Si ya hay una celda con un numero antes al presente
+                // actualizar con la suma de ambos
+                if (tablero[tmpIndex][j] == 0) continue;
+                if (tablero[tmpIndex - 1][j] == 0) {
+                    tablero[tmpIndex - 1][j] = tablero[tmpIndex][j];
+                    tablero[tmpIndex][j] = 0;
+                } else if (tablero[tmpIndex - 1][j] == tablero[tmpIndex][j]) {
+                    tablero[tmpIndex - 1][j] += tablero[tmpIndex][j];
+                    if (tablero[tmpIndex - 1][j] == 2048) {
+                        statusJuego = 2;
+                    }
+                    tablero[tmpIndex][j] = 0;
+                }
+                tmpIndex--;
             }
         }
     }
-    cout << "Tablero Actual" << endl;
-        for (int i = 0; i < tamano; i++)
-        {
-            for (int j = 0; j < tamano; j++)
-            {
-                if (tablero[i][j] == 0)
-                {
-                    cout << "."
-                        << "\t";
-                }
-                else
-                {
-                    cout << tablero[i][j] << "\t";
-                }
-            }
-            cout << endl;
+
+    // Poner nuevo numero en el tablero (2 o 4)
+    int numeroPuesto = 0;
+    while (numeroPuesto == 0)
+    {
+        if (checarLleno(tablero) == 1) {
+            break;
         }
-    system("pause");
+        int renglon = rand() % (tamano);
+        int columna = rand() % (tamano);
+        if (tablero[renglon][columna] == 0) {
+            int numAleatorio = ((rand() % 100) < 50) ? 2 : 4;
+            tablero[renglon][columna] = numAleatorio;
+            numeroPuesto = 1;
+        }
+    }
+
+    return statusJuego;
 }
+
+int moverIzquierda(vector<vector<int>>& tablero)
+{
+    // Status juego es el estado en el que se encuentre el juego
+    // 0 -> Normal
+    // 1 -> Perdio
+    // 2 -> Gano
+    int statusJuego = 0;
+
+    int tamano = tablero.size();
+
+    // Recorrer desde la parte de abajo los numeros
+    // si un numero es igual al de arriba se suma
+    // de lo contrario se queda ahi el numero
+    // si no hay numero sube un espacio
+    for (int i = 0; i < tamano; i++) {
+        for (int j = 1; j < tamano; j++) {
+            int tmpIndex = j;
+            for (int k = 0; k < j; k++) {
+                // Si ya hay una celda con un numero antes al presente
+                // actualizar con la suma de ambos
+                if (tablero[i][tmpIndex] == 0) continue;
+                if (tablero[i][tmpIndex - 1] == 0) {
+                    tablero[i][tmpIndex - 1] = tablero[i][tmpIndex];
+                    tablero[i][tmpIndex] = 0;
+                } else if (tablero[i][tmpIndex - 1] == tablero[i][tmpIndex]) {
+                    tablero[i][tmpIndex - 1] += tablero[i][tmpIndex];
+                    if (tablero[i][tmpIndex - 1] == 2048) {
+                        statusJuego = 2;
+                    }
+                    tablero[i][tmpIndex] = 0;
+                }
+                tmpIndex--;
+            }
+        }
+    }
+
+    // Poner nuevo numero en el tablero (2 o 4)
+    int numeroPuesto = 0;
+    while (numeroPuesto == 0)
+    {
+        if (checarLleno(tablero) == 1) {
+            break;
+        }
+        int renglon = rand() % (tamano);
+        int columna = rand() % (tamano);
+        if (tablero[renglon][columna] == 0) {
+            int numAleatorio = ((rand() % 100) < 50) ? 2 : 4;
+            tablero[renglon][columna] = numAleatorio;
+            numeroPuesto = 1;
+        }
+    }
+
+    return statusJuego;
+}
+
+int moverAbajo(vector<vector<int>>& tablero)
+{
+    // Status juego es el estado en el que se encuentre el juego
+    // 0 -> Normal
+    // 1 -> Perdio
+    // 2 -> Gano
+    int statusJuego = 0;
+
+    int tamano = tablero.size();
+
+    // Recorrer desde la parte de abajo los numeros
+    // si un numero es igual al de arriba se suma
+    // de lo contrario se queda ahi el numero
+    // si no hay numero sube un espacio
+    for (int i = tamano - 2; i >= 0; i--) {
+        for (int j = 0; j < tamano; j++) {
+            int tmpIndex = i;
+            for (int k = 0; k < (tamano - 1 - i); k++) {
+                // Si ya hay una celda con un numero antes al presente
+                // actualizar con la suma de ambos
+                if (tablero[tmpIndex][j] == 0) continue;
+                if (tablero[tmpIndex + 1][j] == 0) {
+                    tablero[tmpIndex + 1][j] = tablero[tmpIndex][j];
+                    tablero[tmpIndex][j] = 0;
+                } else if (tablero[tmpIndex + 1][j] == tablero[tmpIndex][j]) {
+                    tablero[tmpIndex + 1][j] += tablero[tmpIndex][j];
+                    if (tablero[tmpIndex + 1][j] == 2048) {
+                        statusJuego = 2;
+                    }
+                    tablero[tmpIndex][j] = 0;
+                }
+                tmpIndex++;
+            }
+        }
+    }
+
+    // Poner nuevo numero en el tablero (2 o 4)
+    int numeroPuesto = 0;
+    while (numeroPuesto == 0)
+    {
+        if (checarLleno(tablero) == 1) {
+            break;
+        }
+        int renglon = rand() % (tamano);
+        int columna = rand() % (tamano);
+        if (tablero[renglon][columna] == 0) {
+            int numAleatorio = ((rand() % 100) < 50) ? 2 : 4;
+            tablero[renglon][columna] = numAleatorio;
+            numeroPuesto = 1;
+        }
+    }
+
+    return statusJuego;
+}
+
+int moverDerecha(vector<vector<int>>& tablero)
+{
+    // Status juego es el estado en el que se encuentre el juego
+    // 0 -> Normal
+    // 1 -> Perdio
+    // 2 -> Gano
+    int statusJuego = 0;
+
+    int tamano = tablero.size();
+
+    // Recorrer desde la parte de abajo los numeros
+    // si un numero es igual al de arriba se suma
+    // de lo contrario se queda ahi el numero
+    // si no hay numero sube un espacio
+    for (int i = 0; i < tamano; i++) {
+        for (int j = tamano - 2; j >= 0; j--) {
+            int tmpIndex = j;
+            for (int k = 0; k < (tamano - 1 - j); k++) {
+                // Si ya hay una celda con un numero antes al presente
+                // actualizar con la suma de ambos
+                if (tablero[i][tmpIndex] == 0) continue;
+                if (tablero[i][tmpIndex + 1] == 0) {
+                    tablero[i][tmpIndex + 1] = tablero[i][tmpIndex];
+                    tablero[i][tmpIndex] = 0;
+                } else if (tablero[i][tmpIndex + 1] == tablero[i][tmpIndex]) {
+                    tablero[i][tmpIndex + 1] += tablero[i][tmpIndex];
+                    if (tablero[i][tmpIndex + 1] == 2048) {
+                        statusJuego = 2;
+                    }
+                    tablero[i][tmpIndex] = 0;
+                }
+                tmpIndex++;
+            }
+        }
+    }
+
+    // Poner nuevo numero en el tablero (2 o 4)
+    int numeroPuesto = 0;
+    while (numeroPuesto == 0)
+    {
+        if (checarLleno(tablero) == 1) {
+            break;
+        }
+        int renglon = rand() % (tamano);
+        int columna = rand() % (tamano);
+        if (tablero[renglon][columna] == 0) {
+            int numAleatorio = ((rand() % 100) < 50) ? 2 : 4;
+            tablero[renglon][columna] = numAleatorio;
+            numeroPuesto = 1;
+        }
+    }
+
+    return statusJuego;
+}
+
 
 void jugar(string nombreTablero)
 {
@@ -265,6 +458,7 @@ void jugar(string nombreTablero)
             }
             cout << endl;
         }
+        cout << "OPCIONES: (w: arriba) (s: abajo) (a: izquierda) (d: derecha) (q: salir)" << endl;
 
         // Leer movimiento y de acuerdo a este seleccionar una accion
         // w: arriba
@@ -274,25 +468,37 @@ void jugar(string nombreTablero)
         string movimiento;
         cin >> movimiento;
 
+        // Status juego es el estado en el que se encuentre el juego
+        // 0 -> Normal
+        // 1 -> Perdio
+        // 2 -> Gano
+        int statusJuego = 0;
+
         if (movimiento == "w")
         {
-            moverArriba(tablero);
+            statusJuego = moverArriba(tablero);
         } else if (movimiento == "s")
         {
-            /* code */
+            statusJuego = moverAbajo(tablero);
         } else if (movimiento == "a")
         {
-            /* code */
+            statusJuego = moverIzquierda(tablero);
         } else if (movimiento == "d")
         {
-            /* code */
+            statusJuego = moverDerecha(tablero);
+        } else if (movimiento == "q")
+        {
+            break;
         } else {
             cout << "Opcion invalida. Vuelva a intentarlo" << endl;
             system("pause");
         }
-        system("pause");
+        // Checar Status del juego
+        if (statusJuego == 2) {
+            cout << "Felicidades! Usted acaba de ganar." << endl;
+        }
     } while(!juegoTerminado);
-
+    
 }
 
 void nuevoJuego()
