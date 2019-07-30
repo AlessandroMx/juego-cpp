@@ -425,6 +425,30 @@ int moverDerecha(vector<vector<int>>& tablero)
     return statusJuego;
 }
 
+void guardarPartida(vector<vector<int>>& tablero, string nombreArchivo) {
+    ofstream myfile;
+    myfile.open(nombreArchivo);
+
+    int tamano = tablero.size();
+
+    // Llenar de datos el CSV con la matriz brindada
+    for (int i = 0; i < tamano; i++)
+    {
+        for (int j = 0; j < tamano; j++)
+        {
+            if (j == (tamano - 1))
+            {
+                myfile << tablero[i][j] << "\n";
+            }
+            else
+            {
+                myfile << tablero[i][j] << ",";
+            }
+        }
+    }
+
+    myfile.close();
+}
 
 void jugar(string nombreTablero)
 {
@@ -458,7 +482,7 @@ void jugar(string nombreTablero)
             }
             cout << endl;
         }
-        cout << "OPCIONES: (w: arriba) (s: abajo) (a: izquierda) (d: derecha) (q: salir)" << endl;
+        cout << "OPCIONES: (w: arriba) (s: abajo) (a: izquierda) (d: derecha) (q: salir y guardar)" << endl;
 
         // Leer movimiento y de acuerdo a este seleccionar una accion
         // w: arriba
@@ -488,6 +512,7 @@ void jugar(string nombreTablero)
             statusJuego = moverDerecha(tablero);
         } else if (movimiento == "q")
         {
+            guardarPartida(tablero, nombreTablero);
             break;
         } else {
             cout << "Opcion invalida. Vuelva a intentarlo" << endl;
@@ -498,7 +523,6 @@ void jugar(string nombreTablero)
             cout << "Felicidades! Usted acaba de ganar." << endl;
         }
     } while(!juegoTerminado);
-    
 }
 
 void nuevoJuego()
@@ -521,7 +545,10 @@ void nuevoJuego()
 
 void cargarJuego()
 {
-    cout << "Cargando juego." << endl;
+    cout << "Indique el nombre del archivo CSV donde se guardo el juego" << endl;
+    string nombreArchivo;
+    cin >> nombreArchivo;
+    jugar(nombreArchivo);
 }
 
 void puntajesJuego()
